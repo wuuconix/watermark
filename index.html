@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf8" />
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
@@ -7,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
   <title>watermark</title>
 </head>
+
 <body>
 
   <div style="padding-top: 5em;"></div>
@@ -18,27 +20,57 @@
       <option value="2">提取水印</option>
     </select>
     <div style="padding-top: 5em;"></div>
-    <!-- 以下是选择图片的按钮和预览框 -->
-    <div class="ui three column grid">
-      <div class="three wide column">
+    <!-- 嵌入水印模块-->
+    <div class="ui grid" id="function1">
+      <div class="five wide column">
         <input type="file" onchange="previewPic('ori')" id="oriInput" style="display: none;">
         <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="oriImg">
         <button class="ui primary fluid button" id="oriBtn">选择原图</button>
       </div>
-      <div class="three wide column">
+      <div class="five wide column">
         <input type="file" onchange="previewPic('wm')" id="wmInput" style="display: none;">
-        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="wmImg"> 
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="wmImg">
         <button class="ui primary fluid button" id="wmBtn">选择水印</button>
       </div>
-      <div class="three wide column">
-        <div class="ui segment">
+      <div class="five wide column">
+        <div class="ui segment xloading">
           <div class="ui active inverted dimmer">
             <div class="ui large text loader">Loading</div>
           </div>
           <br><br><br><br><br><br>
         </div>
-        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="rstImg"> 
-        <button class="ui positive fluid button" id="genBtn">生成</button>
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="embedImg">
+        <button class="ui positive fluid button" id="embedBtn">嵌入</button>
+      </div>
+    </div>
+
+    <!-- 提取水印模块-->
+    <div class="ui three column grid" id="function2">
+      <div class="five wide column">
+        <input type="file" onchange="previewPic('sync')" id="syncInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="syncImg">
+        <button class="ui primary fluid button" id="syncBtn">选择图片</button>
+      </div>
+      <div class="five wide column">
+        <div class="ui inverted segment">
+          <div class="ui inverted mini input">
+            <input type="text" placeholder="请输入水印宽度" id="widthInput">
+          </div>
+          <div class="ui inverted divider"></div>
+          <div class="ui inverted mini input">
+            <input type="text" placeholder="请输入水印长度" id="heightInput">
+          </div>
+        </div>
+      </div>
+      <div class="five wide column">
+        <div class="ui segment xloading">
+          <div class="ui active inverted dimmer">
+            <div class="ui large text loader">Loading</div>
+          </div>
+          <br><br><br><br><br><br>
+        </div>
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="extrImg">
+        <button class="ui positive fluid button" id="extrBtn">提取</button>
       </div>
     </div>
   </div>
@@ -52,14 +84,14 @@
 </body>
 
 <script>
-  $(document).ready(function()
-  {
+  let [oriImgName, wmImgName, embedImgName, syncImgName, extrImgName] = ["", "", "", "", ""] //分别代表原图，水印，嵌入后，综合态的，提取的结果的文件名称
+  $(document).ready(function () {
     $("#function2").hide();  //默认为嵌入功能
-    $("#loading").hide(); //默认隐藏等待圈
+    $(".xloading").hide(); //默认隐藏等待圈
   })
 
   $('.ui.dropdown').dropdown(); //开启dropdown
-  $('.ui.dropdown').on('click', function() //在点击下拉菜单的选项时进行切换
+  $('.ui.dropdown').on('click', function () //在点击下拉菜单的选项时进行切换
   {
     let a = $('.ui.dropdown').dropdown("get value");
     if (a == "1") //说明选择了嵌入
@@ -74,28 +106,28 @@
     }
   });
 
-  $("#oriBtn").click(function()
+  $("button").click(function()
   {
-    $("#oriInput").click();
-  });
-  
-  $("#wmBtn").click(function()
-  {
-    $("#wmInput").click();
-  });
-
-  $("#genBtn").click(function()
-  {
-    $("#loading").show();
-    $("#rstImg").hide();
+    let id = $(this).prop('id');
+    let type = id.substring(0, id.indexOf('Btn')); //比如wmBtn的type就是wm
+    console.log(type)
+    if (["ori", "wm", "sync"].indexOf(type) > -1)  //点击对应的Input来选择文件
+    {
+      $("#" + type + "Input").click();
+    }
+    else if(["embed", "extr"].indexOf(type) > -1) //隐藏图片，显示loading
+    {
+      $(".xloading").show();
+      $("#" + type + "Img").hide();
+    }
   })
 
   function previewPic(type) { //用data协议获得在线预览图
     var preview = $("#" + type + "Img")[0]; //缩略图标签
-    var file    = $("#" + type + "Input")[0].files[0]; //获取用户选择的图片
-    var reader  = new FileReader();
-      reader.onloadend = function () {
-        preview.src = reader.result;
+    var file = $("#" + type + "Input")[0].files[0]; //获取用户选择的图片
+    var reader = new FileReader();
+    reader.onloadend = function () {
+      preview.src = reader.result;
     }
     if (file) {
       reader.readAsDataURL(file);
@@ -104,34 +136,80 @@
     }
   }
 
-  $("img").click(function() //利用遮罩modal实现预览大图
+  $("img").click(function () //利用遮罩modal实现预览大图
   {
     $("#modalImg")[0].src = $(this)[0].src;
-    if($(this).prop("id").includes("ori"))
-    {
-      $(".center.aligned.header").text("原图:" + $("#oriInput")[0].files[0].name);
-    } else if ($(this).prop("id").includes("wm")){
-      $(".center.aligned.header").text("水印图:" + $("#wmInput")[0].files[0].name);
+    if ($(this).prop("id").includes("ori")) {
+      oriImgName = $("#oriInput")[0].files[0].name;
+      $(".center.aligned.header").text("原图:" + oriImgName);
+    }
+    else if ($(this).prop("id").includes("wm")) {
+      wmImgName = $("#wmInput")[0].files[0].name;
+      $(".center.aligned.header").text("水印图:" + wmImgName);
+    }
+    else if ($(this).prop("id").includes("rst")) {
+      $(".center.aligned.header").text("嵌入水印后的图:" + embedImgName);
+    }
+    else if ($(this).prop("id").includes("sync")) {
+      syncImgName = $("#syncInput")[0].files[0].name;
+      $(".center.aligned.header").text("嵌入了水印的图:" + syncImgName);
+    }
+    else if ($(this).prop("id").includes("extr")) {
+      $(".center.aligned.header").text("提取出的水印:" + extrImgName);
     }
     $(".modal").modal("show");
   })
 
-  $("#genBtn").click(function()
-  {
+  $("#embedBtn").click(function () {
     let formdata = new FormData();
     let oriImg = $("#oriInput")[0].files[0];
     let wmImg = $("#wmInput")[0].files[0];
     formdata.append('oriImg', oriImg);
     formdata.append('wmImg', wmImg);
     $.ajax({
-      url:'https://wmapi.wuuconix.link/upload', 
-      type:'post', 
-      processData:false, 
-      contentType:false, 
-      data:formdata,
-      success: function(res)
-      {
+      url: 'https://wmapi.wuuconix.link/embed',
+      type: 'post',
+      processData: false,
+      contentType: false,
+      data: formdata,
+      success: function (res) {
+        $(".xloading").hide(); //关闭Loading
+        $("#embedImg").show(); //重新显示预览框
         console.log(res);
+        $("#embedImg")[0].src = res['url']; //设置预览图的url，让用户查看
+        embedImgName = res['filename'];
+        $('body').toast({
+          class: 'success',
+          message: "成功得到嵌入水印后的图片" + embedImgName
+        });
+      }
+    })
+  })
+
+  $("#extrBtn").click(function () {
+    let formdata = new FormData();
+    let oriImg = $("#syncInput")[0].files[0];
+    let width = $("#widthInput").val();
+    let height = $("#heightInput").val();
+    formdata.append('syncImg', oriImg);
+    formdata.append("width", width);
+    formdata.append("height", height);
+    $.ajax({
+      url: 'https://wmapi.wuuconix.link/extract',
+      type: 'post',
+      processData: false,
+      contentType: false,
+      data: formdata,
+      success: function (res) {
+        $(".xloading").hide(); //关闭Loading
+        $("#extrImg").show(); //重新显示预览框
+        console.log(res);
+        $("#extrImg")[0].src = res['url']; //设置预览图的url，让用户查看
+        extrImgName = res['filename'];
+        $('body').toast({
+          class: 'success',
+          message: "成功提取得到水印" + extrImgName
+        });
       }
     })
   })

@@ -1,15 +1,15 @@
 from blind_watermark import WaterMark
-import sys
 
-if (sys.argv[1] == "embed"):
+def embed(oriImg:str, wmImg:str):
     bwm1 = WaterMark(password_wm=1, password_img=1)
-    bwm1.read_img('pic/origin.jpg') # 原图 1920 x 1080
-    bwm1.read_wm('pic/watermark.png') # 二维码作为 水印 128 x 128
-    bwm1.embed('pic/embedded.png') # 嵌入水印后的图片
+    bwm1.read_img(f'pic/{oriImg}') # 原图位置
+    bwm1.read_wm(f'pic/{wmImg}') # 水印位置
+    embedImg = oriImg[: -4] + "_embed" + oriImg[-4:] #在原图文件名基础上加上 _embed 表示该图片已经被嵌入了水印
+    bwm1.embed(f'pic/{embedImg}') # 嵌入水印后的图片
+    return embedImg
 
-elif (sys.argv[1] == "extract"):
+def extract(syncImg:str, width:int, height:int):
     bwm1 = WaterMark(password_wm=1, password_img=1)
-    bwm1.extract(filename='pic/embedded.png', wm_shape=(128, 128), out_wm_name='pic/extract.png', ) # wm_shape 指定水印大小
-
-else:
-    print("try like python3 test.py embed/extract")
+    extrImg = syncImg[: -4] + "_extract" + syncImg[-4:] #在原sync文件名基础上加上 _extract 表示该图片是已经被提取出来的水印
+    bwm1.extract(filename=f'pic/{syncImg}', wm_shape=(width, height), out_wm_name=f'pic/{extrImg}', ) # wm_shape 指定水印大小
+    return extrImg
