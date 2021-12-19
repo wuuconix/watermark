@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf8" />
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
+  <title>watermark</title>
+</head>
+<body>
+
+  <div style="padding-top: 5em;"></div>
+  <div class="ui container">
+    <h2 class="ui primary header">选择功能</h2>
+    <!-- 以下是功能选择框 用来选择是嵌入还是提取 -->
+    <select class="ui dropdown" id="data-text-select">
+      <option value="1" selected>嵌入水印</option>
+      <option value="2">提取水印</option>
+    </select>
+    <div style="padding-top: 5em;"></div>
+    <!-- 以下是选择图片的按钮和预览框 -->
+    <div class="ui three column grid">
+      <div class="three wide column">
+        <input type="file" onchange="previewPic('ori')" id="oriInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="oriImg">
+        <button class="ui primary fluid button" id="oriBtn">选择原图</button>
+      </div>
+      <div class="three wide column">
+        <input type="file" onchange="previewPic('wm')" id="wmInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="wmImg"> 
+        <button class="ui primary fluid button" id="wmBtn">选择水印</button>
+      </div>
+      <div class="three wide column">
+        <div class="ui segment">
+          <div class="ui active inverted dimmer">
+            <div class="ui large text loader">Loading</div>
+          </div>
+          <br><br><br><br><br><br>
+        </div>
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="rstImg"> 
+        <button class="ui positive fluid button" id="genBtn">生成</button>
+      </div>
+    </div>
+  </div>
+  <!-- 遮罩 用来展示大图 -->
+  <div class="ui modal">
+    <div class="center aligned header">图片</div>
+    <div class="image aligned content">
+      <img class="image" src="https://fomantic-ui.com/images/wireframe/image.png" id="modalImg">
+    </div>
+  </div>
+</body>
+
+<script>
+  $(document).ready(function()
+  {
+    $("#function2").hide();  //默认为嵌入功能
+    $("#loading").hide(); //默认隐藏等待圈
+  })
+
+  $('.ui.dropdown').dropdown(); //开启dropdown
+  $('.ui.dropdown').on('click', function() //在点击下拉菜单的选项时进行切换
+  {
+    let a = $('.ui.dropdown').dropdown("get value");
+    if (a == "1") //说明选择了嵌入
+    {
+      $("#function1").show();
+      $("#function2").hide();
+    }
+    else if (a == "2") //说明选择了嵌入
+    {
+      $("#function2").show();
+      $("#function1").hide();
+    }
+  });
+
+  $("#oriBtn").click(function()
+  {
+    $("#oriInput").click();
+  });
+  
+  $("#wmBtn").click(function()
+  {
+    $("#wmInput").click();
+  });
+
+  $("#genBtn").click(function()
+  {
+    $("#loading").show();
+    $("#rstImg").hide();
+  })
+
+  function previewPic(type) { //用data协议获得在线预览图
+    var preview = $("#" + type + "Img")[0]; //缩略图标签
+    var file    = $("#" + type + "Input")[0].files[0]; //获取用户选择的图片
+    var reader  = new FileReader();
+      reader.onloadend = function () {
+        preview.src = reader.result;
+    }
+    if (file) {
+      reader.readAsDataURL(file);
+    } else {
+      preview.src = "https://fomantic-ui.com/images/wireframe/image.png";
+    }
+  }
+
+  $("img").click(function() //利用遮罩modal实现预览大图
+  {
+    $("#modalImg")[0].src = $(this)[0].src;
+    if($(this).prop("id").includes("ori"))
+    {
+      $(".center.aligned.header").text("原图:" + $("#oriInput")[0].files[0].name);
+    } else if ($(this).prop("id").includes("wm")){
+      $(".center.aligned.header").text("水印图:" + $("#wmInput")[0].files[0].name);
+    }
+    $(".modal").modal("show");
+  })
+
+  $("#genBtn").click(function()
+  {
+    let formdata = new FormData();
+    let oriImg = $("#oriInput")[0].files[0];
+    let wmImg = $("#wmInput")[0].files[0];
+    formdata.append('oriImg', oriImg);
+    formdata.append('wmImg', wmImg);
+    $.ajax({
+      url:'https://wmapi.wuuconix.link/upload', 
+      type:'post', 
+      processData:false, 
+      contentType:false, 
+      data:formdata,
+      success: function(res)
+      {
+        console.log(res);
+      }
+    })
+  })
+</script>
