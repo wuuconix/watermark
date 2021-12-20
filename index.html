@@ -18,10 +18,10 @@
     <select class="ui dropdown xfunction" id="data-text-select">
       <option value="1" selected>嵌入水印</option>
       <option value="2">提取水印</option>
-      <option value="3">旋转攻击测试</option>
-      <option value="4">缩放攻击测试</option>
-      <option value="5">横向裁剪攻击测试</option>
-      <option value="6">纵向裁剪攻击测试</option>
+      <option value="3">旋转攻击</option>
+      <option value="4">缩放攻击</option>
+      <option value="5">横向裁剪攻击</option>
+      <option value="6">纵向裁剪攻击</option>
     </select>
     <div style="padding-top: 5em;"></div>
     <!-- 嵌入水印模块-->
@@ -55,29 +55,48 @@
         <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="extrOriImg">
         <button class="ui primary fluid button" id="extrOriBtn">选择图片</button>
       </div>
-      <div class="five wide column">\
+      <div class="five wide column">
+
+        <!-- 单选框 表示你已经收到了哪个攻击 -->
+        <h5 class="ui green header">请选择你受到的攻击</h5>
+        <select class="ui dropdown xattack" id="attackSelect">
+          <option value="0" selected>无</option>
+          <option value="1">旋转攻击</option>
+          <option value="2">缩放攻击</option>
+          <option value="3">横向裁剪攻击</option>
+          <option value="4">纵向裁剪攻击</option>
+        </select>
+
         <!-- 必须的水印长度和宽度 -->
-        <div class="ui inverted segment">
-          <div class="ui inverted mini input">
+        <div class="ui segment">
+          <div class="ui mini input">
             <input type="text" placeholder="请输入水印宽度" id="extrWidthInput">
           </div>
-          <div class="ui inverted divider"></div>
-          <div class="ui inverted mini input">
+          <div class="ui divider"></div>
+          <div class="ui mini input">
             <input type="text" placeholder="请输入水印长度" id="extrHeightInput">
           </div>
         </div>
-        <!-- 单选框 表示你已经收到了哪个攻击 -->
-        <div class="ui segment">
-          请选择你受到的<span class="ui red text">攻击</span>
+
+        <!-- 这里和之后function中att1之类的做区分 取名为attack1 -->
+        <div class="ui segment" id="attack1">
+          <div class="ui mini input">
+            <input type="text" placeholder="请输入旋转的角度" id="attack1AngleInput">
+          </div>
         </div>
-        <select class="ui dropdown" id="attSelect">
-          <option value="1" selected>无</option>
-          <option value="2">旋转攻击</option>
-          <option value="3">缩放攻击</option>
-          <option value="4">横向裁剪攻击</option>
-          <option value="5">纵向裁剪攻击</option>
-        </select>
+
+        <!-- attack2 缩放攻击选项 横向、纵向裁剪公用 因为它们都需要原始图片的宽和高-->
+        <div class="ui segment" id="attack2">
+          <div class="ui mini input">
+            <input type="text" placeholder="请输入图片原始宽度" id="attack2WidthInput">
+          </div>
+          <div class="ui divider"></div>
+          <div class="ui mini input">
+            <input type="text" placeholder="请输入图片原始长度" id="attack2HeightInput">
+          </div>
+        </div>
       </div>
+
       <div class="five wide column">
         <div class="ui segment xloading">
           <div class="ui active inverted dimmer">
@@ -210,28 +229,51 @@
 
 <script>
   let imgNameDict = new Array(); //实现类似 imgNameDict['embedOri'] = 'a.jpg' 的操作 得到名称
-  function hideOthers(funId) //用以将其他的功能模块全部隐藏
+  let attackDict = {0: 'none', 1: 'rot', 2: 'resize', 3: 'cutWidth', 4: 'cutHeight'}
+  function hideOthers(Id, type) //用以将其他的功能模块全部隐藏
   {
-    for (i = 0; i < 7; i++)
+    if (type == "function")
     {
-      if (i != funId)
-        $("#function" + i).hide();
-      else
-      $("#function" + i).show();
+      for (i = 0; i < 7; i++)
+      {
+        if (i != Id)
+          $("#function" + i).hide();
+        else
+        $("#function" + i).show();
+      }
+    }
+    else if (type == "attack")
+    {
+      for (i = 1; i < 3; i++)
+      {
+        $("#attack" + i).hide();
+      }
+      if (Id == 1)
+        $("#attack1").show();
+      else if (Id >= 2)
+        $("#attack2").show();
     }
   }
 
   $(document).ready(function () {
-    hideOthers(1);  //默认为嵌入功能
+    hideOthers(1, 'function');  //默认为嵌入功能
+    hideOthers(0, 'attack');  //在提取水印模块 默认不选择任何攻击
     $(".xloading").hide(); //默认隐藏等待圈
   })
 
 
-  $('.ui.dropdown.xfunction').dropdown(); //开启dropdown
+  $('.ui.dropdown.xfunction').dropdown(); //功能选项 开启dropdown
+  $('.ui.dropdown.xattack').dropdown(); //嵌入攻击选项 开启dropdown
   $('.ui.dropdown.xfunction').on('click', function () //在点击下拉菜单的选项时进行切换
   {
     let a = $('.ui.dropdown.xfunction').dropdown("get value");
-    hideOthers(Number(a)); //显示自己，隐藏别人
+    hideOthers(Number(a), 'function'); //显示自己，隐藏别人
+  });
+
+  $('.ui.dropdown.xattack').on('click', function ()
+  {
+    let a = $('.ui.dropdown.xattack').dropdown("get value");
+    hideOthers(Number(a), 'attack'); //显示自己，隐藏别人
   });
 
   $("button").click(function()
@@ -308,11 +350,26 @@
   $("#extrBtn").click(function () {
     let formdata = new FormData();
     let oriImg = $("#extrOriInput")[0].files[0];
-    let width = $("#extrWidthInput").val();
-    let height = $("#extrHeightInput").val();
+    let wmWidth = $("#extrWidthInput").val();
+    let wmHeight = $("#extrHeightInput").val();
+    let option = $('.ui.dropdown.xattack').dropdown("get value"); //option值
+    let type = attackDict[Number(option)]; //得到用户选择的攻击类型
+    if (option == 1)
+    {
+      angle = $("#attack1AngleInput").val();
+      formdata.append('angle', angle);
+    }
+    else if (option >= 2)
+    {
+      oriWidth = $("#attack2WidthInput").val();
+      oriHeight = $("#attack2HeightInput").val();
+      formdata.append('oriWidth', oriWidth);
+      formdata.append('oriHeight', oriHeight);
+    }
+    formdata.append('type', type);
     formdata.append('oriImg', oriImg);
-    formdata.append("width", width);
-    formdata.append("height", height);
+    formdata.append("wmWidth", wmWidth);
+    formdata.append("wmHeight", wmHeight);
     $.ajax({
       url: 'https://wmapi.wuuconix.link/extract',
       type: 'post',

@@ -1,6 +1,6 @@
 from flask import Flask, request
 from numpy import double
-from watermark import embed, extract, rot_att, resize_att, cut_att_width, cut_att_height
+from watermark import embed, extract, rot_att, resize_att, cut_att_width, cut_att_height, anti_cut_att
 
 app = Flask(__name__)
 
@@ -23,10 +23,27 @@ def embedPic():
 @app.route('/extract', methods=['POST'])
 def extractPic():
     oriImg= request.files['oriImg'] #欲从中提取水印的图片
-    width = int(request.form['width']) #水印宽度
-    height = int(request.form['height']) #水印高度
+    wmWidth = int(request.form['wmWidth']) #水印宽度
+    wmHeight = int(request.form['wmHeight']) #水印高度
     saveImg(oriImg)
-    extrImg = extract(oriImg.filename, width, height) #提取得到的水印名
+    type = request.form['type']
+    if (type == 'none'): #没有攻击
+        middleImg = oriImg.filename
+    elif (type == 'rot'): #旋转攻击
+        angle = int(request.form['angle'])
+        middleImg = rot_att(oriImg.filename, -angle) #转回去后的中间产物
+        print(f"rotate back to {middleImg} successfullly")
+    elif (type == 'resize'): #缩放攻击
+        oriWidth = int(request.form['oriWidth'])
+        oriHeight = int(request.form['oriHeight'])
+        middleImg = resize_att(oriImg.filename, (oriWidth, oriHeight)) #缩放回去
+        print(f"resize back to {middleImg} successfullly")
+    elif (type in ["cutWidth", "cutHeight"]): #裁剪攻击
+        oriWidth = int(request.form['oriWidth'])
+        oriHeight = int(request.form['oriHeight'])
+        middleImg = anti_cut_att(oriImg.filename, (oriHeight, oriWidth))
+        print(f"anti cut to {middleImg} successfullly")
+    extrImg = extract(middleImg, wmWidth, wmHeight)
     print(f"extract {extrImg} successfully")
     return {'filename': extrImg, 'url': base_url + extrImg}
 

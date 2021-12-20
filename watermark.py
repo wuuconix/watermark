@@ -36,6 +36,26 @@ def cut_att_width(oriImgName, ratio=0.8):
     cv2.imwrite(f"pic/{rstImgName}", oriImg[:, :width, :])
     return rstImgName
 
+def anti_cut_att(oriImgName, origin_shape):
+    # 反裁剪攻击：复制一块范围，然后补全
+    # origin_shape 分辨率与约定理解的是颠倒的，约定的是列数*行数
+    oriImg = cv2.imread(f"pic/{oriImgName}")
+    rstImg = oriImg.copy()
+    rstImg_shape = rstImg.shape
+    if rstImg_shape[0] > origin_shape[0] or rstImg_shape[0] > origin_shape[0]:
+        print('裁剪打击后的图片，不可能比原始图片大，检查一下')
+        return
+    # 还原纵向打击
+    while rstImg_shape[0] < origin_shape[0]:
+        rstImg = np.concatenate([rstImg, rstImg[:origin_shape[0] - rstImg_shape[0], :, :]], axis=0)
+        rstImg_shape = rstImg.shape
+    while rstImg_shape[1] < origin_shape[1]:
+        rstImg = np.concatenate([rstImg, rstImg[:, :origin_shape[1] - rstImg_shape[1], :]], axis=1)
+        rstImg_shape = rstImg.shape
+    rstImgName = oriImgName[0: -4] + f"_antiCut" + oriImgName[-4:]
+    cv2.imwrite(f"pic/{rstImgName}", rstImg)
+    return rstImgName
+
 def resize_att(oriImgName, out_shape=(500, 500)):
     # 缩放攻击：因为攻击和还原都是缩放，所以攻击和还原都调用这个函数
     oriImg = cv2.imread(f"pic/{oriImgName}")
@@ -43,31 +63,6 @@ def resize_att(oriImgName, out_shape=(500, 500)):
     rstImgName = oriImgName[0: -4] + f"_resize_{out_shape[0]}_{out_shape[1]}" + oriImgName[-4:]
     cv2.imwrite(f"pic/{rstImgName}", rstImg)
     return rstImgName
-
-def bright_att(oriImgName, ratio=0.8):
-    # 亮度调整攻击，ratio应当多于0
-    # ratio>1是调得更亮，ratio<1是亮度更暗
-    oriImg = cv2.imread(f"pic/{oriImgName}")
-    rstImg = oriImg * ratio
-    rstImg[rstImg > 255] = 255
-    rstImgName = oriImgName
-    cv2.imwrite(rstImgName, rstImg)
-
-def shelter_att(oriImgName, ratio=0.1, n=3):
-    # 遮挡攻击：遮挡图像中的一部分
-    # n个遮挡块
-    # 每个遮挡块所占比例为ratio
-    oriImg = cv2.imread(f"pic/{oriImgName}")
-    oriImg_shape = oriImg.shape
-    rstImg = oriImg.copy()
-    for i in range(n):
-        tmp = np.random.rand() * (1 - ratio)  # 随机选择一个地方，1-ratio是为了防止溢出
-        start_height, end_height = int(tmp * oriImg_shape[0]), int((tmp + ratio) * oriImg_shape[0])
-        tmp = np.random.rand() * (1 - ratio)
-        start_width, end_width = int(tmp * oriImg_shape[1]), int((tmp + ratio) * oriImg_shape[1])
-        rstImg[start_height:end_height, start_width:end_width, :] = 0
-    rstImgName = oriImgName
-    cv2.imwrite(rstImgName, rstImg)
 
 def rot_att(oriImgName, angle=45):
     # 旋转攻击
@@ -78,5 +73,3 @@ def rot_att(oriImgName, angle=45):
     rstImgName = oriImgName[0: -4] + f"_rot{angle}" + oriImgName[-4:]
     cv2.imwrite(f"pic/{rstImgName}", rstImg)
     return rstImgName
-
-# resize_att('a.jpg', (400, 400))
