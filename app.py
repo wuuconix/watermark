@@ -1,33 +1,62 @@
 from flask import Flask, request
-from watermark import embed, extract
+from numpy import double
+from watermark import embed, extract, rot_att, resize_att, cut_att_width, cut_att_height
 
 app = Flask(__name__)
 
-@app.route('/embed', methods=['GET', 'POST'])
-def embedPic():
-    if request.method == 'POST':
-        oriImg= request.files['oriImg'] #原始图片对象
-        wmImg = request.files['wmImg'] #水印图片对象
-        oriImg.save("pic/" + oriImg.filename) #存储
-        wmImg.save("pic/" + wmImg.filename)
-        print(f"save origin {oriImg.filename} succesfully")
-        print(f"save wm {wmImg.filename} succesfully")
-        embedImg = embed(oriImg.filename, wmImg.filename) #嵌入后的文件名
-        print(f"embed {embedImg} successfully")
-        url = f"https://watermark.wuuconix.link/pic/{embedImg}"
-    return {'filename': embedImg, 'url': url}
+base_url = "https://watermark.wuuconix.link/pic/" #生成出来的图片的基址
 
-@app.route('/extract', methods=['GET', 'POST'])
+def saveImg(img): #保存img
+    img.save(f'pic/{img.filename}')
+    print(f"save {img.filename} successfully")
+
+@app.route('/embed', methods=['POST'])
+def embedPic():
+    oriImg= request.files['oriImg'] #原始图片对象
+    wmImg = request.files['wmImg'] #水印图片对象
+    saveImg(oriImg)
+    saveImg(wmImg)
+    embedImg = embed(oriImg.filename, wmImg.filename) #嵌入后的文件名
+    print(f"embed {embedImg} successfully")
+    return {'filename': embedImg, 'url': base_url + embedImg}
+
+@app.route('/extract', methods=['POST'])
 def extractPic():
-    if request.method == 'POST':
-        syncImg= request.files['syncImg'] #sync，即有水印的图像
+    oriImg= request.files['oriImg'] #欲从中提取水印的图片
+    width = int(request.form['width']) #水印宽度
+    height = int(request.form['height']) #水印高度
+    saveImg(oriImg)
+    extrImg = extract(oriImg.filename, width, height) #提取得到的水印名
+    print(f"extract {extrImg} successfully")
+    return {'filename': extrImg, 'url': base_url + extrImg}
+
+@app.route('/attack', methods=['POST'])
+def attackPic():
+    attack_type = request.form['type'] #得到攻击类型
+    if attack_type == "rot":
+        oriImg = request.files['oriImg']
+        angle = int(request.form['angle'])
+        saveImg(oriImg)
+        rstImg = rot_att(oriImg.filename, angle) #旋转后的图片名称
+        return {'filename': rstImg, 'url': base_url + rstImg}
+    elif attack_type == "resize":
+        oriImg = request.files['oriImg']
         width = int(request.form['width']) #水印宽度
         height = int(request.form['height']) #水印高度
-        syncImg.save("pic/" + syncImg.filename) #存储
-        print(f"save sync {syncImg.filename} succesfully")
-        extrImg = extract(syncImg.filename, width, height) #提取得到的水印名
-        print(f"extract {extrImg} successfully")
-        url = f"https://watermark.wuuconix.link/pic/{extrImg}"
-    return {'filename': extrImg, 'url': url}
+        saveImg(oriImg)
+        rstImg = resize_att(oriImg.filename, (width, height))
+        return {'filename': rstImg, 'url': base_url + rstImg}
+    elif attack_type == "cutWidth":
+        oriImg = request.files['oriImg']
+        ratio = double(request.form['ratio']) #裁切比例
+        saveImg(oriImg)
+        rstImg = cut_att_width(oriImg.filename, ratio)
+        return {'filename': rstImg, 'url': base_url + rstImg}
+    elif attack_type == "cutHeight":
+        oriImg = request.files['oriImg']
+        ratio = double(request.form['ratio']) #裁切比例
+        saveImg(oriImg)
+        rstImg = cut_att_height(oriImg.filename, ratio)
+        return {'filename': rstImg, 'url': base_url + rstImg}
 
 app.run(debug=True)

@@ -1,0 +1,18 @@
+$("#att4Btn").click(function () {
+    let formdata = new FormData();
+    let oriImg = $("#att4OriInput")[0].files[0];
+    let ratio = $("#att4RatioInput").val();
+    formdata.append('oriImg', oriImg);
+    formdata.append("ratio", ratio);
+    formdata.append('type', 'cutHeight'); //旋转攻击
+    $.ajax({
+      url: 'https://wmapi.wuuconix.link/attack',
+      type: 'post',
+      processData: false,
+      contentType: false,
+      data: formdata,
+      success: function (res) {
+        afterSuccess(res, 'att4');
+      }
+    })
+  })

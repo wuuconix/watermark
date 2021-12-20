@@ -15,22 +15,26 @@
   <div class="ui container">
     <h2 class="ui primary header">选择功能</h2>
     <!-- 以下是功能选择框 用来选择是嵌入还是提取 -->
-    <select class="ui dropdown" id="data-text-select">
+    <select class="ui dropdown xfunction" id="data-text-select">
       <option value="1" selected>嵌入水印</option>
       <option value="2">提取水印</option>
+      <option value="3">旋转攻击测试</option>
+      <option value="4">缩放攻击测试</option>
+      <option value="5">横向裁剪攻击测试</option>
+      <option value="6">纵向裁剪攻击测试</option>
     </select>
     <div style="padding-top: 5em;"></div>
     <!-- 嵌入水印模块-->
     <div class="ui grid" id="function1">
       <div class="five wide column">
-        <input type="file" onchange="previewPic('ori')" id="oriInput" style="display: none;">
-        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="oriImg">
-        <button class="ui primary fluid button" id="oriBtn">选择原图</button>
+        <input type="file" onchange="previewPic('embedOri')" id="embedOriInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="embedOriImg">
+        <button class="ui primary fluid button" id="embedOriBtn">选择原图</button>
       </div>
       <div class="five wide column">
-        <input type="file" onchange="previewPic('wm')" id="wmInput" style="display: none;">
-        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="wmImg">
-        <button class="ui primary fluid button" id="wmBtn">选择水印</button>
+        <input type="file" onchange="previewPic('embedWm')" id="embedWmInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="embedWmImg">
+        <button class="ui primary fluid button" id="embedWmBtn">选择水印</button>
       </div>
       <div class="five wide column">
         <div class="ui segment xloading">
@@ -39,7 +43,7 @@
           </div>
           <br><br><br><br><br><br>
         </div>
-        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="embedImg">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="embedRstImg">
         <button class="ui positive fluid button" id="embedBtn">嵌入</button>
       </div>
     </div>
@@ -47,18 +51,56 @@
     <!-- 提取水印模块-->
     <div class="ui three column grid" id="function2">
       <div class="five wide column">
-        <input type="file" onchange="previewPic('sync')" id="syncInput" style="display: none;">
-        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="syncImg">
-        <button class="ui primary fluid button" id="syncBtn">选择图片</button>
+        <input type="file" onchange="previewPic('extrOri')" id="extrOriInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="extrOriImg">
+        <button class="ui primary fluid button" id="extrOriBtn">选择图片</button>
+      </div>
+      <div class="five wide column">\
+        <!-- 必须的水印长度和宽度 -->
+        <div class="ui inverted segment">
+          <div class="ui inverted mini input">
+            <input type="text" placeholder="请输入水印宽度" id="extrWidthInput">
+          </div>
+          <div class="ui inverted divider"></div>
+          <div class="ui inverted mini input">
+            <input type="text" placeholder="请输入水印长度" id="extrHeightInput">
+          </div>
+        </div>
+        <!-- 单选框 表示你已经收到了哪个攻击 -->
+        <div class="ui segment">
+          请选择你受到的<span class="ui red text">攻击</span>
+        </div>
+        <select class="ui dropdown" id="attSelect">
+          <option value="1" selected>无</option>
+          <option value="2">旋转攻击</option>
+          <option value="3">缩放攻击</option>
+          <option value="4">横向裁剪攻击</option>
+          <option value="5">纵向裁剪攻击</option>
+        </select>
+      </div>
+      <div class="five wide column">
+        <div class="ui segment xloading">
+          <div class="ui active inverted dimmer">
+            <div class="ui large text loader">Loading</div>
+          </div>
+          <br><br><br><br><br><br>
+        </div>
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="extrRstImg">
+        <button class="ui positive fluid button" id="extrBtn">提取</button>
+      </div>
+    </div>
+
+    <!-- 旋转攻击测试模块-->
+    <div class="ui three column grid" id="function3">
+      <div class="five wide column">
+        <input type="file" onchange="previewPic('att1Ori')" id="att1OriInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="att1OriImg">
+        <button class="ui primary fluid button" id="att1OriBtn">选择图片</button>
       </div>
       <div class="five wide column">
         <div class="ui inverted segment">
           <div class="ui inverted mini input">
-            <input type="text" placeholder="请输入水印宽度" id="widthInput">
-          </div>
-          <div class="ui inverted divider"></div>
-          <div class="ui inverted mini input">
-            <input type="text" placeholder="请输入水印长度" id="heightInput">
+            <input type="text" placeholder="请输入旋转角度(逆时针)" id="att1AngleInput">
           </div>
         </div>
       </div>
@@ -69,11 +111,94 @@
           </div>
           <br><br><br><br><br><br>
         </div>
-        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="extrImg">
-        <button class="ui positive fluid button" id="extrBtn">提取</button>
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="att1RstImg">
+        <button class="ui positive fluid button" id="att1Btn">攻击</button>
+      </div>
+    </div>
+
+    <!-- 缩放攻击测试模块-->
+    <div class="ui three column grid" id="function4">
+      <div class="five wide column">
+        <input type="file" onchange="previewPic('att2Ori')" id="att2OriInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="att2OriImg">
+        <button class="ui primary fluid button" id="att2OriBtn">选择图片</button>
+      </div>
+      <div class="five wide column">
+        <div class="ui inverted segment">
+          <div class="ui inverted mini input">
+            <input type="text" placeholder="请输入缩放宽度" id="att2WidthInput">
+          </div>
+          <div class="ui inverted divider"></div>
+          <div class="ui inverted mini input">
+            <input type="text" placeholder="请输入缩放高度" id="att2HeightInput">
+          </div>
+        </div>
+      </div>
+      <div class="five wide column">
+        <div class="ui segment xloading">
+          <div class="ui active inverted dimmer">
+            <div class="ui large text loader">Loading</div>
+          </div>
+          <br><br><br><br><br><br>
+        </div>
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="att2RstImg">
+        <button class="ui positive fluid button" id="att2Btn">攻击</button>
+      </div>
+    </div>
+
+    <!-- 横向裁剪攻击测试模块-->
+    <div class="ui three column grid" id="function5">
+      <div class="five wide column">
+        <input type="file" onchange="previewPic('att3Ori')" id="att3OriInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="att3OriImg">
+        <button class="ui primary fluid button" id="att3OriBtn">选择图片</button>
+      </div>
+      <div class="five wide column">
+        <div class="ui inverted segment">
+          <div class="ui inverted mini input">
+            <input type="text" placeholder="请输入裁切比例" id="att3RatioInput">
+          </div>
+        </div>
+      </div>
+      <div class="five wide column">
+        <div class="ui segment xloading">
+          <div class="ui active inverted dimmer">
+            <div class="ui large text loader">Loading</div>
+          </div>
+          <br><br><br><br><br><br>
+        </div>
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="att3RstImg">
+        <button class="ui positive fluid button" id="att3Btn">攻击</button>
+      </div>
+    </div>
+
+    <!-- 纵向裁剪攻击测试模块-->
+    <div class="ui three column grid" id="function6">
+      <div class="five wide column">
+        <input type="file" onchange="previewPic('att4Ori')" id="att4OriInput" style="display: none;">
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="att4OriImg">
+        <button class="ui primary fluid button" id="att4OriBtn">选择图片</button>
+      </div>
+      <div class="five wide column">
+        <div class="ui inverted segment">
+          <div class="ui inverted mini input">
+            <input type="text" placeholder="请输入裁切比例" id="att4RatioInput">
+          </div>
+        </div>
+      </div>
+      <div class="five wide column">
+        <div class="ui segment xloading">
+          <div class="ui active inverted dimmer">
+            <div class="ui large text loader">Loading</div>
+          </div>
+          <br><br><br><br><br><br>
+        </div>
+        <img class="ui image" src="https://fomantic-ui.com/images/wireframe/image.png" id="att4RstImg">
+        <button class="ui positive fluid button" id="att4Btn">攻击</button>
       </div>
     </div>
   </div>
+
   <!-- 遮罩 用来展示大图 -->
   <div class="ui modal">
     <div class="center aligned header">图片</div>
@@ -84,47 +209,51 @@
 </body>
 
 <script>
-  let [oriImgName, wmImgName, embedImgName, syncImgName, extrImgName] = ["", "", "", "", ""] //分别代表原图，水印，嵌入后，综合态的，提取的结果的文件名称
+  let imgNameDict = new Array(); //实现类似 imgNameDict['embedOri'] = 'a.jpg' 的操作 得到名称
+  function hideOthers(funId) //用以将其他的功能模块全部隐藏
+  {
+    for (i = 0; i < 7; i++)
+    {
+      if (i != funId)
+        $("#function" + i).hide();
+      else
+      $("#function" + i).show();
+    }
+  }
+
   $(document).ready(function () {
-    $("#function2").hide();  //默认为嵌入功能
+    hideOthers(1);  //默认为嵌入功能
     $(".xloading").hide(); //默认隐藏等待圈
   })
 
-  $('.ui.dropdown').dropdown(); //开启dropdown
-  $('.ui.dropdown').on('click', function () //在点击下拉菜单的选项时进行切换
+
+  $('.ui.dropdown.xfunction').dropdown(); //开启dropdown
+  $('.ui.dropdown.xfunction').on('click', function () //在点击下拉菜单的选项时进行切换
   {
-    let a = $('.ui.dropdown').dropdown("get value");
-    if (a == "1") //说明选择了嵌入
-    {
-      $("#function1").show();
-      $("#function2").hide();
-    }
-    else if (a == "2") //说明选择了嵌入
-    {
-      $("#function2").show();
-      $("#function1").hide();
-    }
+    let a = $('.ui.dropdown.xfunction').dropdown("get value");
+    hideOthers(Number(a)); //显示自己，隐藏别人
   });
 
   $("button").click(function()
   {
     let id = $(this).prop('id');
-    let type = id.substring(0, id.indexOf('Btn')); //比如wmBtn的type就是wm
+    let type = id.substring(0, id.indexOf('Btn')); //比如embedWmBtn的type就是embedWm
     console.log(type)
-    if (["ori", "wm", "sync"].indexOf(type) > -1)  //点击对应的Input来选择文件
+    if (["embedOri", "embedWm", "extrOri", "att1Ori", "att2Ori", "att3Ori", "att4Ori"].indexOf(type) > -1)  //点击对应的Input来选择文件
     {
       $("#" + type + "Input").click();
     }
-    else if(["embed", "extr"].indexOf(type) > -1) //隐藏图片，显示loading
+    else if(["embed", "extr", "att1", "att2", "att3", "att4"].indexOf(type) > -1) //隐藏图片，显示loading
     {
       $(".xloading").show();
-      $("#" + type + "Img").hide();
+      $("#" + type + "RstImg").hide();
     }
   })
 
   function previewPic(type) { //用data协议获得在线预览图
     var preview = $("#" + type + "Img")[0]; //缩略图标签
     var file = $("#" + type + "Input")[0].files[0]; //获取用户选择的图片
+    imgNameDict[type] = file.name; //加入图片名字字典
     var reader = new FileReader();
     reader.onloadend = function () {
       preview.src = reader.result;
@@ -139,31 +268,29 @@
   $("img").click(function () //利用遮罩modal实现预览大图
   {
     $("#modalImg")[0].src = $(this)[0].src;
-    if ($(this).prop("id").includes("ori")) {
-      oriImgName = $("#oriInput")[0].files[0].name;
-      $(".center.aligned.header").text("原图:" + oriImgName);
-    }
-    else if ($(this).prop("id").includes("wm")) {
-      wmImgName = $("#wmInput")[0].files[0].name;
-      $(".center.aligned.header").text("水印图:" + wmImgName);
-    }
-    else if ($(this).prop("id").includes("rst")) {
-      $(".center.aligned.header").text("嵌入水印后的图:" + embedImgName);
-    }
-    else if ($(this).prop("id").includes("sync")) {
-      syncImgName = $("#syncInput")[0].files[0].name;
-      $(".center.aligned.header").text("嵌入了水印的图:" + syncImgName);
-    }
-    else if ($(this).prop("id").includes("extr")) {
-      $(".center.aligned.header").text("提取出的水印:" + extrImgName);
-    }
+    let id = $(this).prop('id');
+    let type = id.substring(0, id.indexOf('Img')); //比如att1OriImg 的type就是aa1Ori
+    $(".center.aligned.header").text(imgNameDict[type]);
     $(".modal").modal("show");
   })
 
+  function afterSuccess(res, type) //处理ajax从后端得到数据后的重复工作
+  {
+    $(".xloading").hide(); //关闭Loading
+    $("#" + type + "RstImg").show(); //重新显示预览框
+    console.log(res);
+    $("#" + type + "RstImg")[0].src = res['url']; //设置预览图的url，让用户查看
+    imgNameDict[type + 'Rst'] = res['filename']; //加入名字字典
+    $('body').toast({
+      class: 'success',
+      message: "成功得到" + res['filename']
+    });
+  }
+
   $("#embedBtn").click(function () {
     let formdata = new FormData();
-    let oriImg = $("#oriInput")[0].files[0];
-    let wmImg = $("#wmInput")[0].files[0];
+    let oriImg = $("#embedOriInput")[0].files[0];
+    let wmImg = $("#embedWmInput")[0].files[0];
     formdata.append('oriImg', oriImg);
     formdata.append('wmImg', wmImg);
     $.ajax({
@@ -173,25 +300,17 @@
       contentType: false,
       data: formdata,
       success: function (res) {
-        $(".xloading").hide(); //关闭Loading
-        $("#embedImg").show(); //重新显示预览框
-        console.log(res);
-        $("#embedImg")[0].src = res['url']; //设置预览图的url，让用户查看
-        embedImgName = res['filename'];
-        $('body').toast({
-          class: 'success',
-          message: "成功得到嵌入水印后的图片" + embedImgName
-        });
+        afterSuccess(res, 'embed');
       }
     })
   })
 
   $("#extrBtn").click(function () {
     let formdata = new FormData();
-    let oriImg = $("#syncInput")[0].files[0];
-    let width = $("#widthInput").val();
-    let height = $("#heightInput").val();
-    formdata.append('syncImg', oriImg);
+    let oriImg = $("#extrOriInput")[0].files[0];
+    let width = $("#extrWidthInput").val();
+    let height = $("#extrHeightInput").val();
+    formdata.append('oriImg', oriImg);
     formdata.append("width", width);
     formdata.append("height", height);
     $.ajax({
@@ -201,15 +320,85 @@
       contentType: false,
       data: formdata,
       success: function (res) {
-        $(".xloading").hide(); //关闭Loading
-        $("#extrImg").show(); //重新显示预览框
-        console.log(res);
-        $("#extrImg")[0].src = res['url']; //设置预览图的url，让用户查看
-        extrImgName = res['filename'];
-        $('body').toast({
-          class: 'success',
-          message: "成功提取得到水印" + extrImgName
-        });
+        afterSuccess(res, 'extr')
+      }
+    })
+  })
+
+  $("#att1Btn").click(function () {
+    let formdata = new FormData();
+    let oriImg = $("#att1OriInput")[0].files[0];
+    let angle = $("#att1AngleInput").val();
+    formdata.append('oriImg', oriImg);
+    formdata.append("angle", angle);
+    formdata.append('type', 'rot'); //旋转攻击
+    $.ajax({
+      url: 'https://wmapi.wuuconix.link/attack',
+      type: 'post',
+      processData: false,
+      contentType: false,
+      data: formdata,
+      success: function (res) {
+        afterSuccess(res, 'att1');
+      }
+    })
+  })
+
+  $("#att2Btn").click(function () {
+    let formdata = new FormData();
+    let oriImg = $("#att2OriInput")[0].files[0];
+    let width = $("#att2WidthInput").val();
+    let height = $("#att2HeightInput").val();
+    formdata.append('oriImg', oriImg);
+    formdata.append("width", width);
+    formdata.append("height", height);
+    formdata.append('type', 'resize'); //旋转攻击
+    $.ajax({
+      url: 'https://wmapi.wuuconix.link/attack',
+      type: 'post',
+      processData: false,
+      contentType: false,
+      data: formdata,
+      success: function (res) {
+        afterSuccess(res, 'att2');
+      }
+    })
+  })
+
+  $("#att3Btn").click(function () {
+    let formdata = new FormData();
+    let oriImg = $("#att3OriInput")[0].files[0];
+    let ratio = $("#att3RatioInput").val();
+    formdata.append('oriImg', oriImg);
+    formdata.append("ratio", ratio);
+    formdata.append('type', 'cutWidth'); //旋转攻击
+    $.ajax({
+      url: 'https://wmapi.wuuconix.link/attack',
+      type: 'post',
+      processData: false,
+      contentType: false,
+      data: formdata,
+      success: function (res) {
+        afterSuccess(res, 'att3');
+      }
+    })
+  })
+
+  $("#att4Btn").click(function () {
+    let formdata = new FormData();
+    let oriImg = $("#att4OriInput")[0].files[0];
+    let ratio = $("#att4RatioInput").val();
+    formdata.append('oriImg', oriImg);
+    formdata.append("ratio", ratio);
+    formdata.append('type', 'cutHeight'); //旋转攻击
+    $.ajax({
+      url: 'https://wmapi.wuuconix.link/attack',
+      type: 'post',
+      processData: false,
+      contentType: false,
+      data: formdata,
+      success: function (res) {
+        afterSuccess(res, 'att4');
       }
     })
   })
