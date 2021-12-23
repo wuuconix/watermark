@@ -76,4 +76,4 @@ def attackPic():
         rstImg = cut_att_height(oriImg.filename, ratio)
         return {'filename': rstImg, 'url': base_url + rstImg}
 
-app.run(debug=True)
+app.run('0.0.0.0', debug=True)
