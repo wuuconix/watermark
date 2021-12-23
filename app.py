@@ -6,10 +6,17 @@ app = Flask(__name__)
 
 base_url = "https://watermark.wuuconix.link/pic/" #生成出来的图片的基址
 
-def saveImg(img): #保存img
+def saveImg(img): #保存图片的函数
     img.save(f'pic/{img.filename}')
     print(f"save {img.filename} successfully")
 
+"""
+embed接口
+用来处理 嵌入水印 的请求
+接收 原图oriImg 与 水印图wmImg
+调用 embed函数 进行水印的嵌入
+以json格式返回处理后的文件名和url
+"""
 @app.route('/embed', methods=['POST'])
 def embedPic():
     oriImg= request.files['oriImg'] #原始图片对象
@@ -20,7 +27,14 @@ def embedPic():
     print(f"embed {embedImg} successfully")
     return {'filename': embedImg, 'url': base_url + embedImg}
 
-@app.route('/extract', methods=['POST'])
+"""
+extract接口 
+用来处理 提取水印 的请求
+接收 图片oriImg 水印宽wmWidth 水印高wmHeight 和攻击类型 type[和攻击附带的参数]
+根据攻击类型先进行相对应的反攻击 rot_att / resize_att / anti_cut_att ,再将反攻击后的图片利用extract函数提取水印
+以json格式返回处理后的文件名和url
+"""
+@app.route('/extract', methods=['POST']) #
 def extractPic():
     oriImg= request.files['oriImg'] #欲从中提取水印的图片
     wmWidth = int(request.form['wmWidth']) #水印宽度
@@ -47,6 +61,13 @@ def extractPic():
     print(f"extract {extrImg} successfully")
     return {'filename': extrImg, 'url': base_url + extrImg}
 
+"""
+attack接口 
+用来处理 攻击 的请求
+接收 攻击类型type 图片oriImg [角度angle | 宽度width & 高度height | 裁切比例 ratio]
+调用相关攻击函数进行攻击 rot_att / resize_att / cut_att_width / cut_att_height
+以json格式返回处理后的文件名和url
+"""
 @app.route('/attack', methods=['POST'])
 def attackPic():
     attack_type = request.form['type'] #得到攻击类型
@@ -58,8 +79,8 @@ def attackPic():
         return {'filename': rstImg, 'url': base_url + rstImg}
     elif attack_type == "resize":
         oriImg = request.files['oriImg']
-        width = int(request.form['width']) #水印宽度
-        height = int(request.form['height']) #水印高度
+        width = int(request.form['width'])
+        height = int(request.form['height'])
         saveImg(oriImg)
         rstImg = resize_att(oriImg.filename, (width, height))
         return {'filename': rstImg, 'url': base_url + rstImg}

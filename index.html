@@ -316,7 +316,7 @@
     $(".modal").modal("show");
   })
 
-  function afterSuccess(res, type) //处理ajax从后端得到数据后的重复工作
+  function afterSuccess(res, type) //ajax获得后端回应后 关闭loading，重新显示预览框，并将后台返回的url设置为预览图
   {
     $(".xloading").hide(); //关闭Loading
     $("#" + type + "RstImg").show(); //重新显示预览框
@@ -325,11 +325,11 @@
     imgNameDict[type + 'Rst'] = res['filename']; //加入名字字典
     $('body').toast({
       class: 'success',
-      message: "成功得到" + res['filename']
+      message: "成功得到" + res['filename'] //弹出一条message显示 成功得到
     });
   }
 
-  $("#embedBtn").click(function () {
+  $("#embedBtn").click(function () { //嵌入水印按钮点击后 向embed接口发送数据(原图 & 水印图)
     let formdata = new FormData();
     let oriImg = $("#embedOriInput")[0].files[0];
     let wmImg = $("#embedWmInput")[0].files[0];
@@ -347,19 +347,19 @@
     })
   })
 
-  $("#extrBtn").click(function () {
+  $("#extrBtn").click(function () { //提取水印按钮 向extract接口发送数据(原图 & 水印宽高 & 攻击类型 & [角度 | 原图宽高])
     let formdata = new FormData();
     let oriImg = $("#extrOriInput")[0].files[0];
     let wmWidth = $("#extrWidthInput").val();
     let wmHeight = $("#extrHeightInput").val();
-    let option = $('.ui.dropdown.xattack').dropdown("get value"); //option值
+    let option = $('.ui.dropdown.xattack').dropdown("get value"); //用户选择的攻击方式的option值
     let type = attackDict[Number(option)]; //得到用户选择的攻击类型
-    if (option == 1)
+    if (option == 1) //旋转攻击
     {
       angle = $("#attack1AngleInput").val();
       formdata.append('angle', angle);
     }
-    else if (option >= 2)
+    else if (option >= 2) //其他的攻击都需要用到原图的长宽
     {
       oriWidth = $("#attack2WidthInput").val();
       oriHeight = $("#attack2HeightInput").val();
@@ -382,7 +382,7 @@
     })
   })
 
-  $("#att1Btn").click(function () {
+  $("#att1Btn").click(function () { //旋转攻击按钮 向attack接口发送数据(攻击类型为rot & 原图 & 角度)
     let formdata = new FormData();
     let oriImg = $("#att1OriInput")[0].files[0];
     let angle = $("#att1AngleInput").val();
@@ -401,7 +401,7 @@
     })
   })
 
-  $("#att2Btn").click(function () {
+  $("#att2Btn").click(function () { //缩放攻击按钮 向attack接口发送数据(攻击类型为resize & 原图 & 缩放后的宽度 & 缩放的高度)
     let formdata = new FormData();
     let oriImg = $("#att2OriInput")[0].files[0];
     let width = $("#att2WidthInput").val();
@@ -422,13 +422,13 @@
     })
   })
 
-  $("#att3Btn").click(function () {
+  $("#att3Btn").click(function () { //横向裁切攻击按钮 向attack接口发送数据(攻击类型为cutWidth & 原图 & 裁切比例)
     let formdata = new FormData();
     let oriImg = $("#att3OriInput")[0].files[0];
     let ratio = $("#att3RatioInput").val();
     formdata.append('oriImg', oriImg);
     formdata.append("ratio", ratio);
-    formdata.append('type', 'cutWidth'); //旋转攻击
+    formdata.append('type', 'cutWidth'); 
     $.ajax({
       url: 'https://wmapi.wuuconix.link/attack',
       type: 'post',
@@ -441,13 +441,13 @@
     })
   })
 
-  $("#att4Btn").click(function () {
+  $("#att4Btn").click(function () { //纵向裁切攻击按钮 向attack接口发送数据(攻击类型为cutHeight & 原图 & 裁切比例)
     let formdata = new FormData();
     let oriImg = $("#att4OriInput")[0].files[0];
     let ratio = $("#att4RatioInput").val();
     formdata.append('oriImg', oriImg);
     formdata.append("ratio", ratio);
-    formdata.append('type', 'cutHeight'); //旋转攻击
+    formdata.append('type', 'cutHeight');
     $.ajax({
       url: 'https://wmapi.wuuconix.link/attack',
       type: 'post',
