@@ -65,7 +65,7 @@ def extractPic():
 attack接口 
 用来处理 攻击 的请求
 接收 攻击类型type 图片oriImg [角度angle | 宽度width & 高度height | 裁切比例 ratio]
-调用相关攻击函数进行攻击 rot_att / resize_att / cut_att_width / cut_att_height
+根据type 调用相关攻击函数进行攻击 rot_att / resize_att / cut_att_width / cut_att_height
 以json格式返回处理后的文件名和url
 """
 @app.route('/attack', methods=['POST'])
