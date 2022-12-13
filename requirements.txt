@@ -1,0 +1,4 @@
+blind_watermark==0.4.2
+Flask==2.0.2
+numpy==1.22.1
+opencv_python==4.6.0.66

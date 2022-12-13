@@ -4,7 +4,7 @@ from watermark import embed, extract, rot_att, resize_att, cut_att_width, cut_at
 
 app = Flask(__name__)
 
-base_url = "https://watermark.wuuconix.link/pic/" #生成出来的图片的基址
+base_url = "http://localhost/pic/" #生成出来的图片的基址
 
 def saveImg(img): #保存图片的函数
     img.save(f'pic/{img.filename}')
