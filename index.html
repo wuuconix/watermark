@@ -336,7 +336,7 @@
     formdata.append('oriImg', oriImg);
     formdata.append('wmImg', wmImg);
     $.ajax({
-      url: 'http://localhost/embed',
+      url: 'http://localhost/api/embed',
       type: 'post',
       processData: false,
       contentType: false,
@@ -371,7 +371,7 @@
     formdata.append("wmWidth", wmWidth);
     formdata.append("wmHeight", wmHeight);
     $.ajax({
-      url: 'http://localhost/extract',
+      url: 'http://localhost/api/extract',
       type: 'post',
       processData: false,
       contentType: false,
@@ -390,7 +390,7 @@
     formdata.append("angle", angle);
     formdata.append('type', 'rot'); //旋转攻击
     $.ajax({
-      url: 'http://localhost/attack',
+      url: 'http://localhost/api/attack',
       type: 'post',
       processData: false,
       contentType: false,
@@ -411,7 +411,7 @@
     formdata.append("height", height);
     formdata.append('type', 'resize'); //旋转攻击
     $.ajax({
-      url: 'http://localhost/attack',
+      url: 'http://localhost/api/attack',
       type: 'post',
       processData: false,
       contentType: false,
@@ -430,7 +430,7 @@
     formdata.append("ratio", ratio);
     formdata.append('type', 'cutWidth'); 
     $.ajax({
-      url: 'http://localhost/attack',
+      url: 'http://localhost/api/attack',
       type: 'post',
       processData: false,
       contentType: false,
@@ -449,7 +449,7 @@
     formdata.append("ratio", ratio);
     formdata.append('type', 'cutHeight');
     $.ajax({
-      url: 'http://localhost/attack',
+      url: 'http://localhost/api/attack',
       type: 'post',
       processData: false,
       contentType: false,
